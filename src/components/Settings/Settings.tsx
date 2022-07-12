@@ -1,28 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Submit from '../Submit/Submit';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
 import {counterSlice} from '../../redux/reducers/counter';
 
-type PropsType = {
-    minValue?: number
-    maxValue?: number
-    errorMinVal?: boolean
-    errorMaxVal?: boolean
-    changeMinValue?: (value: string) => void
-    changeMaxValue?: (value: string) => void
-    turnOffSettings?: () => void
-}
-
-const Settings = (props: PropsType) => {
+const Settings = () => {
     const dispatch = useAppDispatch();
     const {increment, setMaxValue, setMinValue, turnOnSettings} = counterSlice.actions;
     const {count, minValue, maxValue} = useAppSelector(state => state.rootReducer.counterReducer);
+
+    const [errorMaxVal, setErrorMaxVal] = React.useState(false);
+    const [errorMinVal, setErrorMinVal] = React.useState(false);
 
     function turnOnSettingsHandler() {
         dispatch(turnOnSettings(false))
         dispatch(increment(minValue))
     }
+
+    React.useEffect(() => {
+        if(maxValue <= minValue) {
+            setErrorMaxVal(true)
+        } else {
+            setErrorMaxVal(false)
+        }
+
+    }, [maxValue])
+
+    React.useEffect(() => {
+        if(maxValue <= minValue) {
+            setErrorMinVal(true)
+        } else {
+            setErrorMinVal(false)
+        }
+
+    }, [minValue])
 
     return (
         <div>
@@ -32,7 +43,7 @@ const Settings = (props: PropsType) => {
                 label="Max value" 
                 color="primary" 
                 type="number" 
-                error={props.errorMaxVal}
+                error={errorMaxVal}
                 focused 
             />
 
@@ -43,12 +54,12 @@ const Settings = (props: PropsType) => {
                 label="Min value" 
                 color="primary" 
                 type="number" 
-                error={props.errorMinVal}
+                error={errorMinVal}
                 focused 
             />
 
             <div className="btnBox btnBox_set">
-                <Submit title='SET' callBack={turnOnSettingsHandler} disabled={props.errorMinVal || props.errorMaxVal}/>
+                <Submit title='SET' callBack={turnOnSettingsHandler} disabled={errorMinVal || errorMaxVal}/>
             </div>
         </div>
     )
