@@ -4,19 +4,25 @@ import Grid from '@mui/material/Grid';
 import Settings from './components/Settings/Settings';
 import Display from './components/Display/Display';
 import {useAppDispatch, useAppSelector} from './redux/hooks/hooks';
-import {counterSlice} from './redux/reducers/counter'
 
 const App = () => {
-    const dispatch = useAppDispatch()
-    const {increment} = counterSlice.actions
-    const {count} = useAppSelector(state => state.rootReducer.counterReducer)
-
+    const {showSettings} = useAppSelector(state => state.rootReducer.counterReducer)
     return (
         <Container fixed>
-           {count}
-           <button onClick={() => dispatch(increment(count + 1))}>INCREMENT</button>
+            <Grid container direction="row" justifyContent="center" alignItems="center">
+                <Grid item md={4}>
+                    <div className="incBox">
+                        {
+                            ! showSettings
+                            ? <Display/>
+                            : <Settings/>
+                        }
+                        
+                    </div>
+                </Grid>
+            </Grid>
         </Container>
-    );
+    )
 }
 
 export default App;

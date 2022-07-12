@@ -1,23 +1,21 @@
 import React from 'react';
 import Submit from '../Submit/Submit';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
+import {counterSlice} from '../../redux/reducers/counter';
 
-type PropsType = {
-    inc: number
-    maxValue: number
-    turnOnSettings: () => void
-    callBackInc: () => void
-    callBackReset: () => void
-}
+const Display = () => {
+    const dispatch = useAppDispatch();
+    const {increment, turnOnSettings} = counterSlice.actions;
+    const {count, minValue, maxValue} = useAppSelector(state => state.rootReducer.counterReducer)
 
-const Display = (props: PropsType) => {
     return (
         <div>
-            <p className={props.inc === props.maxValue ? 'incBox__text incBox__text_red' : 'incBox__text'}>{props.inc}</p>
+            <p className={count === maxValue ? 'incBox__text incBox__text_red' : 'incBox__text'}>{count}</p>
 
             <div className="btnBox">
-                <Submit title='INC' disabled={props.inc === props.maxValue ? true : false} callBack={props.callBackInc}/>
-                <Submit title='RESET' disabled={false} callBack={props.callBackReset}/>
-                <Submit title='SET' disabled={false} callBack={props.turnOnSettings}/>
+                <Submit title='INC' disabled={count === maxValue ? true : false} callBack={() => dispatch(increment(count + 1))}/>
+                <Submit title='RESET' disabled={count === minValue ? true : false} callBack={() => dispatch(increment(minValue))}/>
+                <Submit title='SET' disabled={false} callBack={() => dispatch(turnOnSettings(true))}/>
             </div>
         </div>
     )
