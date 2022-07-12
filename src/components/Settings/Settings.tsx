@@ -2,35 +2,54 @@ import React, { useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Submit from '../Submit/Submit';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
-import {counterSlice} from '../../redux/reducers/counter';
+import {counterSlice, getMinValueThunk} from '../../redux/reducers/countSlice';
 
-const Settings = () => {
+type propsType = {
+    minValue: null | number
+    maxValue: null | number
+}
+
+const Settings = (props: propsType) => {
     const dispatch = useAppDispatch();
     const {increment, setMaxValue, setMinValue, turnOnSettings} = counterSlice.actions;
-    const {count, minValue, maxValue} = useAppSelector(state => state.rootReducer.counterReducer);
+
+    const [minValue, changeMinValue] = React.useState(props.minValue);
+    const [maxValue, changeMaxValue] = React.useState(props.maxValue);
 
     const [errorMaxVal, setErrorMaxVal] = React.useState(false);
     const [errorMinVal, setErrorMinVal] = React.useState(false);
 
     function turnOnSettingsHandler() {
+        if(props.minValue !== null && props.maxValue !== null) {
+            dispatch(setMinValue(minValue))
+            dispatch(setMaxValue(maxValue))
+        }
+
+        if(minValue !== null) {
+            dispatch(increment(minValue))
+        }
+
         dispatch(turnOnSettings(false))
-        dispatch(increment(minValue))
     }
 
     React.useEffect(() => {
-        if(maxValue <= minValue) {
-            setErrorMaxVal(true)
-        } else {
-            setErrorMaxVal(false)
+        if(maxValue !== null && minValue !== null) {
+            if(maxValue <= minValue) {
+                setErrorMaxVal(true)
+            } else {
+                setErrorMaxVal(false)
+            }
         }
 
     }, [maxValue])
 
     React.useEffect(() => {
-        if(maxValue <= minValue) {
-            setErrorMinVal(true)
-        } else {
-            setErrorMinVal(false)
+        if(maxValue !== null && minValue !== null) {
+            if(maxValue <= minValue) {
+                setErrorMinVal(true)
+            } else {
+                setErrorMinVal(false)
+            }
         }
 
     }, [minValue])
@@ -39,7 +58,7 @@ const Settings = () => {
         <div>
             <TextField 
                 value={maxValue}
-                onChange={e => dispatch(setMaxValue(+e.currentTarget.value))}
+                onChange={e => changeMaxValue(+e.currentTarget.value)}
                 label="Max value" 
                 color="primary" 
                 type="number" 
@@ -49,7 +68,7 @@ const Settings = () => {
 
             <TextField 
                 value={minValue}
-                onChange={e => dispatch(setMinValue(+e.currentTarget.value))}
+                onChange={e => changeMinValue(+e.currentTarget.value)}
                 className="incBox__input" 
                 label="Min value" 
                 color="primary" 
@@ -63,7 +82,6 @@ const Settings = () => {
             </div>
         </div>
     )
-
 }
 
 export default Settings;

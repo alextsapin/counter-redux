@@ -4,9 +4,32 @@ import Grid from '@mui/material/Grid';
 import Settings from './components/Settings/Settings';
 import Display from './components/Display/Display';
 import {useAppDispatch, useAppSelector} from './redux/hooks/hooks';
+import {counterSlice, getMinValueThunk, getMaxValueThunk, setMinValue, setMaxValue} from './redux/reducers/countSlice';
 
 const App = () => {
-    const {showSettings} = useAppSelector(state => state.rootReducer.counterReducer)
+    const dispatch = useAppDispatch();
+    const {increment} = counterSlice.actions;
+    const {showSettings} = useAppSelector(state => state.counterReducer);
+    const {minValue, maxValue} = useAppSelector(state => state.counterReducer)
+   
+    React.useEffect(() => {
+        dispatch(getMaxValueThunk())
+        dispatch(getMinValueThunk())
+    }, [])
+
+    React.useEffect(() => {
+        if(minValue !== null) {
+            dispatch(setMinValue(minValue))
+            dispatch(increment(minValue))
+        }
+    }, [minValue])
+
+    React.useEffect(() => {
+        if(maxValue !== null) {
+            dispatch(setMaxValue(maxValue))
+        }
+    }, [maxValue])
+
     return (
         <Container fixed>
             <Grid container direction="row" justifyContent="center" alignItems="center">
@@ -14,10 +37,9 @@ const App = () => {
                     <div className="incBox">
                         {
                             ! showSettings
-                            ? <Display/>
-                            : <Settings/>
+                            ? <Display minValue={minValue} maxValue={maxValue}/>
+                            : <Settings minValue={minValue} maxValue={maxValue}/>
                         }
-                        
                     </div>
                 </Grid>
             </Grid>
